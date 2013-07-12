@@ -1,0 +1,124 @@
+<!DOCTYPE HTML>
+<!--
+/*
+ * jQuery File Upload Plugin Basic Demo 1.0
+ * https://github.com/blueimp/jQuery-File-Upload
+ *
+ * Copyright 2013, Sebastian Tschan
+ * https://blueimp.net
+ *
+ * Licensed under the MIT license:
+ * http://www.opensource.org/licenses/MIT
+ */
+-->
+<html lang="en">
+<head>
+<!-- Force latest IE rendering engine or ChromeFrame if installed -->
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><![endif]-->
+<meta charset="utf-8">
+<title>Zeman Family Photo Uploader</title>
+<meta name="description" content="File Upload widget with multiple file selection, drag&amp;drop support and progress bar for jQuery. Supports cross-domain, chunked and resumable file uploads. Works with any server-side platform (PHP, Python, Ruby on Rails, Java, Node.js, Go etc.) that supports standard HTML form file uploads.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Bootstrap CSS Toolkit styles -->
+<link rel="stylesheet" href="http://blueimp.github.com/cdn/css/bootstrap.min.css">
+<!-- Generic page styles -->
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/Upload.css">
+<!-- Bootstrap styles for responsive website layout, supporting different screen sizes -->
+<link rel="stylesheet" href="http://blueimp.github.com/cdn/css/bootstrap-responsive.min.css">
+<!-- Bootstrap CSS fixes for IE6 -->
+<!--[if lt IE 7]><link rel="stylesheet" href="http://blueimp.github.com/cdn/css/bootstrap-ie6.min.css"><![endif]-->
+<!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
+<link rel="stylesheet" href="css/jquery.fileupload-ui.css">
+</head>
+<body>
+<div class="container">
+	
+	<div class="left">
+        <h3>Upload</h3>
+        <p class="english">
+            Enter your name, so that the images can be stored in an appropriate folder, e.g. "Mark/somepicture.jpg". <br />
+            After you have finished uploading your pictures, enter your name one more time and press "I'm done!" to create a .zip file with your images.
+            This makes it much easier for everybody else to download the pictures.
+        </p>
+        <p class="german">
+            Bitte gib deinen Namen in die erste Box ein, damit deine Bilder in den passenden Ordner gespeichert werden können, z.B. "Mark/einbild.jpg". <br />
+            Wenn du alle Bilder hochgeladen hast, gib deinen Namen noch einmal ein und drücke "I'm done!", damit eine .zip Datei erstellt wird. 
+            Dies macht den Download für alle viel einfacher.
+        </p>
+        Your name: <input type="text" name="person_name" value="" id="person_name"><br />
+        <br />
+        
+        <!-- The fileinput-button span is used to style the file input field as button -->
+    <span class="btn btn-success fileinput-button">
+        <i class="icon-plus icon-white"></i>
+        <span>Select files...</span>
+        <!-- The file input field used as target for the file upload widget -->
+        <input id="fileupload" type="file" name="files[]" multiple>
+    </span><br/>
+    <br/>
+    <br/>
+        
+          <div id="files"></div>
+           <button id="donebutton"> I'm done !</button>
+    </div>
+    
+   
+    <div class="right">
+        <h3>Download</h3>
+        
+        <div id="downloadupdate">
+        	
+        </div>
+    </div>
+    
+ <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
+<script src="js/vendor/jquery.ui.widget.js"></script>
+<!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
+<script src="js/jquery.iframe-transport.js"></script>
+<!-- The basic File Upload plugin -->
+<script src="js/jquery.fileupload.js"></script>
+<script>
+/*jslint unparam: true */
+/*global window, $ */
+$(function () {
+	$('#fileupload').bind('fileuploadsubmit', function (e, data) {
+    // The example input, doesn't have to be part of the upload form:
+    var input = $('#person_name');
+    data.formData = {person_name: input.val()};
+   
+});
+    'use strict';
+    // Change this to the location of your server-side upload handler:
+    var url = 'server/php/';
+    $('#fileupload').fileupload({
+        url: url,
+        dataType: 'json',
+        acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+        done: function (e, data) {
+            $.each(data.result.files, function (index, file) {
+                $('<p/>').text(file.name + ' uploaded').appendTo('#files');
+            });
+        },
+        progressall: function (e, data) {
+            var progress = parseInt(data.loaded / data.total * 100, 10);
+            $('#progress .bar').css(
+                'width',
+                progress + '%'
+            );
+        }
+    });
+});
+
+$("#donebutton").click(function(data){
+	var name = $('#person_name').val();
+	$("#files").empty();
+	$.get('server/php/done.php?name='+ name,function(data){
+		$("#downloadupdate").append('<p> <a href="'+ data.path+'" >'+ name + '.zip </a> </p>')
+	});
+});
+
+</script>
+</body> 
+</html>
